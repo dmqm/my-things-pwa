@@ -26,6 +26,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
   const locations = (useLiveQuery(() => db.locations.toArray()) || []) as StorageLocation[];
 
   const [isAddingCat, setIsAddingCat] = useState(false);
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
   const [catName, setCatName] = useState('');
   const [catColor, setCatColor] = useState(PRESETS_COLORS[0]);
   const [catIcon, setCatIcon] = useState(PRESETS_ICONS[0]);
@@ -93,29 +94,52 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
     e.target.value = ''; // Reset input
   };
 
-  // Create Category
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  // Open edit modal for a category
+  const handleOpenEdit = (cat: Category) => {
+    setEditingCatId(cat.id);
+    setCatName(cat.name);
+    setCatColor(cat.color);
+    setCatIcon(cat.icon);
+    setIsAddingCat(true);
+  };
+
+  // Close add/edit modal
+  const handleCloseModal = () => {
+    setIsAddingCat(false);
+    setEditingCatId(null);
+    setCatName('');
+    setCatColor(PRESETS_COLORS[0]);
+    setCatIcon(PRESETS_ICONS[0]);
+  };
+
+  // Create or Update Category
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName.trim()) return;
 
-    const newCat: Category = {
-      id: 'cat-' + Math.random().toString(36).substring(2, 9),
-      name: catName.trim(),
-      color: catColor,
-      icon: catIcon
-    };
-
-    await db.categories.add(newCat);
-    setCatName('');
-    setIsAddingCat(false);
+    if (editingCatId) {
+      await db.categories.update(editingCatId, {
+        name: catName.trim(),
+        color: catColor,
+        icon: catIcon,
+      });
+    } else {
+      const newCat: Category = {
+        id: 'cat-' + Math.random().toString(36).substring(2, 9),
+        name: catName.trim(),
+        color: catColor,
+        icon: catIcon,
+      };
+      await db.categories.add(newCat);
+    }
+    handleCloseModal();
   };
 
   // Delete Category
   const handleDeleteCategory = async (catId: string, name: string) => {
-    // Check if category has items
     const hasItems = items.some((item: Item) => item.categoryId === catId);
     if (hasItems) {
-      alert(`无法删除“${name}”，该分类下仍存有物品。请先移动相关物品后再试。`);
+      alert(`无法删除"${name}"，该分类下仍存有物品。请先移动相关物品后再试。`);
       return;
     }
 
@@ -124,7 +148,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
       return;
     }
 
-    if (confirm(`确定要删除分类“${name}”吗？`)) {
+    if (confirm(`确定要删除分类"${name}"吗？`)) {
       await db.categories.delete(catId);
     }
   };
@@ -183,50 +207,6 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
         </div>
       </div>
 
-      {/* Backup and Restore */}
-      <div className="section-title">
-        <span>数据备份与安全</span>
-      </div>
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <div className="flex-between">
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: '500' }}>导出备份</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>备份为 JSON 文件，用于数据保存或转移</div>
-          </div>
-          <button className="btn btn-secondary" style={{ padding: '8px 14px', fontSize: '14px' }} onClick={handleExport}>
-            <Icons.Download size={16} style={{ marginRight: '6px' }} />
-            导出数据
-          </button>
-        </div>
-
-        <hr style={{ border: 'none', borderTop: '1px solid var(--border-light)' }} />
-
-        <div className="flex-between">
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: '500' }}>恢复备份</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>从导出的 JSON 文件恢复所有物品及设置</div>
-          </div>
-          <label className="btn btn-secondary" style={{ padding: '8px 14px', fontSize: '14px', cursor: 'pointer' }}>
-            <Icons.Upload size={16} style={{ marginRight: '6px' }} />
-            导入数据
-            <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
-          </label>
-        </div>
-
-        <hr style={{ border: 'none', borderTop: '1px solid var(--border-light)' }} />
-
-        <div className="flex-between">
-          <div>
-            <div style={{ fontSize: '15px', fontWeight: '500', color: '#ff3b30' }}>重置所有数据</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>清空全部记录并恢复默认设置</div>
-          </div>
-          <button className="btn btn-danger" style={{ padding: '8px 14px', fontSize: '14px' }} onClick={handleResetDatabase}>
-            <Icons.Trash2 size={16} style={{ marginRight: '6px' }} />
-            重置系统
-          </button>
-        </div>
-      </div>
-
       {/* Category Management */}
       <div className="section-title">
         <span>分类管理</span>
@@ -238,21 +218,21 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
         </button>
       </div>
 
-      {/* Modal to add category */}
+      {/* Modal to add/edit category */}
       {isAddingCat && (
-        <div className="modal-overlay open" onClick={() => setIsAddingCat(false)}>
+        <div className="modal-overlay open" onClick={handleCloseModal}>
           <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="modal-handle" />
             <div className="modal-header">
-              <span className="modal-title">新增分类</span>
+              <span className="modal-title">{editingCatId ? '编辑分类' : '新增分类'}</span>
               <button 
                 style={{ background: 'none', border: 'none', color: 'var(--accent-color)', fontSize: '16px', fontWeight: '500', cursor: 'pointer' }}
-                onClick={() => setIsAddingCat(false)}
+                onClick={handleCloseModal}
               >
                 取消
               </button>
             </div>
-            <form onSubmit={handleCreateCategory} className="modal-body">
+            <form onSubmit={handleSaveCategory} className="modal-body">
               <div className="form-group">
                 <label className="form-label">分类名称</label>
                 <input 
@@ -291,7 +271,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
 
               <div className="form-group">
                 <label className="form-label">图标标志</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px', marginTop: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '6px' }}>
                   {PRESETS_ICONS.map(icon => (
                     <button
                       key={icon}
@@ -316,7 +296,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
               </div>
 
               <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }}>
-                保存分类
+                {editingCatId ? '更新分类' : '保存分类'}
               </button>
             </form>
           </div>
@@ -351,22 +331,46 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
               </div>
               <span style={{ fontSize: '15px', fontWeight: '500' }}>{cat.name}</span>
             </div>
-            {/* Show item counts or delete button */}
-            <div className="flex-center" style={{ gap: '12px' }}>
+            <div className="flex-center" style={{ gap: '8px' }}>
               <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
                 {items.filter((i: Item) => i.categoryId === cat.id).reduce((sum: number, i: Item) => sum + (i.quantity || 1), 0)} 件
               </span>
-              {!['cat-others'].includes(cat.id) && (
-                <button 
-                  style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                  onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                >
-                  <Icons.Trash2 size={16} />
-                </button>
-              )}
+              <button 
+                style={{ background: 'none', border: 'none', color: 'var(--accent-color)', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                onClick={(e) => { e.stopPropagation(); handleOpenEdit(cat); }}
+                title="编辑分类"
+              >
+                <Icons.Pencil size={16} />
+              </button>
+              <button 
+                style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                onClick={() => handleDeleteCategory(cat.id, cat.name)}
+              >
+                <Icons.Trash2 size={16} />
+              </button>
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Backup and Restore - compact 3-button row */}
+      <div className="section-title">
+        <span>数据备份与安全</span>
+      </div>
+      <div className="card" style={{ display: 'flex', gap: '8px' }}>
+        <button className="btn btn-secondary" style={{ flex: 1, minHeight: '44px', fontSize: '14px' }} onClick={handleExport}>
+          <Icons.Download size={16} style={{ marginRight: '6px' }} />
+          导出
+        </button>
+        <label className="btn btn-secondary" style={{ flex: 1, minHeight: '44px', fontSize: '14px', cursor: 'pointer', margin: 0 }}>
+          <Icons.Upload size={16} style={{ marginRight: '6px' }} />
+          导入
+          <input type="file" accept=".json" onChange={handleImport} style={{ display: 'none' }} />
+        </label>
+        <button className="btn btn-danger" style={{ flex: 1, minHeight: '44px', fontSize: '14px' }} onClick={handleResetDatabase}>
+          <Icons.Trash2 size={16} style={{ marginRight: '6px' }} />
+          重置
+        </button>
       </div>
 
       {/* Database Diagnostics */}

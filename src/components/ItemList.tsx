@@ -183,7 +183,7 @@ export const ItemList: React.FC<ItemListProps> = ({
             borderRadius: '100px', 
             backgroundColor: selectedCatId === 'all' ? 'var(--bg-secondary)' : 'rgba(var(--accent-rgb), 0.1)', 
             color: selectedCatId === 'all' ? 'var(--text-secondary)' : 'var(--accent-color)',
-            borderColor: selectedCatId === 'all' ? 'var(--border-light)' : 'rgba(var(--accent-rgb), 0.2)',
+            border: `1px solid ${selectedCatId === 'all' ? 'var(--border-light)' : 'rgba(var(--accent-rgb), 0.2)'}`,
             fontSize: '13px',
             outline: 'none',
             cursor: 'pointer'
@@ -205,7 +205,7 @@ export const ItemList: React.FC<ItemListProps> = ({
             borderRadius: '100px', 
             backgroundColor: selectedLocId === 'all' ? 'var(--bg-secondary)' : 'rgba(var(--accent-rgb), 0.1)', 
             color: selectedLocId === 'all' ? 'var(--text-secondary)' : 'var(--accent-color)',
-            borderColor: selectedLocId === 'all' ? 'var(--border-light)' : 'rgba(var(--accent-rgb), 0.2)',
+            border: `1px solid ${selectedLocId === 'all' ? 'var(--border-light)' : 'rgba(var(--accent-rgb), 0.2)'}`,
             fontSize: '13px',
             outline: 'none',
             cursor: 'pointer'
@@ -227,7 +227,7 @@ export const ItemList: React.FC<ItemListProps> = ({
             borderRadius: '100px', 
             backgroundColor: selectedTag === 'all' ? 'var(--bg-secondary)' : 'rgba(var(--accent-rgb), 0.1)', 
             color: selectedTag === 'all' ? 'var(--text-secondary)' : 'var(--accent-color)',
-            borderColor: selectedTag === 'all' ? 'var(--border-light)' : 'rgba(var(--accent-rgb), 0.2)',
+            border: `1px solid ${selectedTag === 'all' ? 'var(--border-light)' : 'rgba(var(--accent-rgb), 0.2)'}`,
             fontSize: '13px',
             outline: 'none',
             cursor: 'pointer'
@@ -249,7 +249,7 @@ export const ItemList: React.FC<ItemListProps> = ({
             borderRadius: '100px', 
             backgroundColor: 'var(--bg-secondary)', 
             color: 'var(--text-secondary)',
-            borderColor: 'var(--border-light)',
+            border: '1px solid var(--border-light)',
             fontSize: '13px',
             outline: 'none',
             cursor: 'pointer'
