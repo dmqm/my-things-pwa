@@ -150,11 +150,24 @@ export const ItemList: React.FC<ItemListProps> = ({
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         {searchQuery && (
-          <Icons.X 
-            size={18} 
-            style={{ color: 'var(--text-tertiary)', cursor: 'pointer' }} 
-            onClick={() => setSearchQuery('')} 
-          />
+          <button
+            onClick={() => setSearchQuery('')}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              width: 44,
+              height: 44,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              color: 'var(--text-tertiary)'
+            }}
+          >
+            <Icons.X size={18} />
+          </button>
         )}
       </div>
 
@@ -165,7 +178,8 @@ export const ItemList: React.FC<ItemListProps> = ({
           value={selectedCatId} 
           onChange={(e) => setSelectedCatId(e.target.value)}
           style={{ 
-            padding: '6px 12px', 
+            padding: '0 16px', 
+            minHeight: '44px',
             borderRadius: '100px', 
             backgroundColor: selectedCatId === 'all' ? 'var(--bg-secondary)' : 'rgba(var(--accent-rgb), 0.1)', 
             color: selectedCatId === 'all' ? 'var(--text-secondary)' : 'var(--accent-color)',
@@ -186,7 +200,8 @@ export const ItemList: React.FC<ItemListProps> = ({
           value={selectedLocId} 
           onChange={(e) => setSelectedLocId(e.target.value)}
           style={{ 
-            padding: '6px 12px', 
+            padding: '0 16px', 
+            minHeight: '44px',
             borderRadius: '100px', 
             backgroundColor: selectedLocId === 'all' ? 'var(--bg-secondary)' : 'rgba(var(--accent-rgb), 0.1)', 
             color: selectedLocId === 'all' ? 'var(--text-secondary)' : 'var(--accent-color)',
@@ -207,7 +222,8 @@ export const ItemList: React.FC<ItemListProps> = ({
           value={selectedTag} 
           onChange={(e) => setSelectedTag(e.target.value)}
           style={{ 
-            padding: '6px 12px', 
+            padding: '0 16px', 
+            minHeight: '44px',
             borderRadius: '100px', 
             backgroundColor: selectedTag === 'all' ? 'var(--bg-secondary)' : 'rgba(var(--accent-rgb), 0.1)', 
             color: selectedTag === 'all' ? 'var(--text-secondary)' : 'var(--accent-color)',
@@ -228,7 +244,8 @@ export const ItemList: React.FC<ItemListProps> = ({
           value={sortBy} 
           onChange={(e) => setSortBy(e.target.value)}
           style={{ 
-            padding: '6px 12px', 
+            padding: '0 16px', 
+            minHeight: '44px',
             borderRadius: '100px', 
             backgroundColor: 'var(--bg-secondary)', 
             color: 'var(--text-secondary)',
