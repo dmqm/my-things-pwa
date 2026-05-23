@@ -41,6 +41,18 @@ export const ItemForm: React.FC<ItemFormProps> = ({
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Keyboard occlusion prevention: scroll focused element into view on visualViewport resize
+  useEffect(() => {
+    const handleResize = () => {
+      const el = document.activeElement;
+      if (el instanceof HTMLElement) {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    };
+    window.visualViewport?.addEventListener('resize', handleResize);
+    return () => window.visualViewport?.removeEventListener('resize', handleResize);
+  }, []);
+
   // Set default values or load item for editing
   useEffect(() => {
     if (categories.length > 0 && !categoryId) {
@@ -318,7 +330,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
                 <button 
                   type="button" 
                   className="btn btn-secondary" 
-                  style={{ padding: '8px 12px', minWidth: '40px' }}
+                  style={{ padding: '8px 12px', minWidth: '44px', minHeight: '44px' }}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 >
                   -
@@ -335,7 +347,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({
                 <button 
                   type="button" 
                   className="btn btn-secondary" 
-                  style={{ padding: '8px 12px', minWidth: '40px' }}
+                  style={{ padding: '8px 12px', minWidth: '44px', minHeight: '44px' }}
                   onClick={() => setQuantity(quantity + 1)}
                 >
                   +
