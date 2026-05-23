@@ -358,7 +358,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
               </span>
               {!['cat-others'].includes(cat.id) && (
                 <button 
-                  style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', padding: '4px' }}
+                  style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
                   onClick={() => handleDeleteCategory(cat.id, cat.name)}
                 >
                   <Icons.Trash2 size={16} />

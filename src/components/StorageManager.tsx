@@ -281,7 +281,7 @@ export const StorageManager: React.FC<StorageManagerProps> = ({ onSelectItem }) 
                   {/* Actions */}
                   <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
                     <button 
-                      style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', padding: '4px' }}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
                       onClick={() => {
                         setEditingLocId(loc.id);
                         setEditLocName(loc.name);
@@ -292,7 +292,7 @@ export const StorageManager: React.FC<StorageManagerProps> = ({ onSelectItem }) 
                       <Icons.Edit2 size={14} />
                     </button>
                     <button 
-                      style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', padding: '4px' }}
+                      style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
                       onClick={() => handleDeleteLocation(loc.id)}
                       title="删除"
                     >
