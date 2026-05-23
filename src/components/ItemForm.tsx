@@ -239,21 +239,32 @@ export const ItemForm: React.FC<ItemFormProps> = ({
                 onClick={(e) => { e.stopPropagation(); setPhoto(''); }}
                 style={{ 
                   position: 'absolute', 
-                  top: '-8px', 
-                  right: '-8px', 
-                  width: '24px', 
-                  height: '24px', 
+                  top: '-18px', 
+                  right: '-18px', 
+                  width: '44px', 
+                  height: '44px', 
                   borderRadius: '50%', 
-                  backgroundColor: '#ff3b30', 
-                  color: '#ffffff',
-                  border: '2px solid var(--bg-secondary)',
+                  backgroundColor: 'transparent',
+                  border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  padding: 0
                 }}
               >
-                <Icons.X size={12} />
+                <span style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ff3b30',
+                  border: '2px solid var(--bg-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Icons.X size={12} color="#fff" />
+                </span>
               </button>
             )}
             <input 
@@ -441,11 +452,14 @@ export const ItemForm: React.FC<ItemFormProps> = ({
                       background: 'none',
                       border: '1px solid var(--border-light)',
                       borderRadius: '100px',
-                      padding: '2px 8px',
-                      fontSize: '11px',
+                      padding: '0 16px',
+                      minHeight: '44px',
+                      fontSize: '13px',
                       color: 'var(--text-secondary)',
                       cursor: 'pointer',
-                      backgroundColor: 'var(--bg-secondary)'
+                      backgroundColor: 'var(--bg-secondary)',
+                      display: 'inline-flex',
+                      alignItems: 'center'
                     }}
                     onClick={() => handleAddTag(tag)}
                   >

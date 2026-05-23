@@ -160,21 +160,21 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
           <div className="flex-center" style={{ gap: '6px' }}>
             <button 
               className={`btn ${theme === 'light' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '6px' }}
+              style={{ minHeight: '44px', padding: '0 16px', fontSize: '13px', borderRadius: '6px' }}
               onClick={() => setTheme('light')}
             >
               浅色
             </button>
             <button 
               className={`btn ${theme === 'dark' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '6px' }}
+              style={{ minHeight: '44px', padding: '0 16px', fontSize: '13px', borderRadius: '6px' }}
               onClick={() => setTheme('dark')}
             >
               深色
             </button>
             <button 
               className={`btn ${theme === 'system' ? 'btn-primary' : 'btn-secondary'}`}
-              style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '6px' }}
+              style={{ minHeight: '44px', padding: '0 16px', fontSize: '13px', borderRadius: '6px' }}
               onClick={() => setTheme('system')}
             >
               系统
@@ -275,8 +275,8 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
                       key={color}
                       type="button"
                       style={{
-                        width: '32px',
-                        height: '32px',
+                        width: '44px',
+                        height: '44px',
                         borderRadius: '50%',
                         backgroundColor: color,
                         border: catColor === color ? '3px solid var(--text-primary)' : '1px solid rgba(0,0,0,0.1)',
@@ -298,7 +298,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
                       type="button"
                       className="flex-center"
                       style={{
-                        height: '36px',
+                        minHeight: '44px',
                         borderRadius: '8px',
                         backgroundColor: catIcon === icon ? 'rgba(var(--accent-rgb), 0.15)' : 'var(--bg-secondary)',
                         border: catIcon === icon ? '1px solid var(--accent-color)' : '1px solid var(--border-light)',
