@@ -291,7 +291,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme, setTheme }) => {
 
               <div className="form-group">
                 <label className="form-label">图标标志</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: '8px', marginTop: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginTop: '6px' }}>
                   {PRESETS_ICONS.map(icon => (
                     <button
                       key={icon}
