@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { db, type StorageLocation, type Item } from '../db/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import * as Icons from 'lucide-react';
@@ -18,6 +18,9 @@ export const StorageManager: React.FC<StorageManagerProps> = ({ onSelectItem }) 
   const [editingLocId, setEditingLocId] = useState<string | null>(null);
   const [editLocName, setEditLocName] = useState('');
   const [editLocDesc, setEditLocDesc] = useState('');
+  const [editModeCardId, setEditModeCardId] = useState<string | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTriggeredRef = useRef(false);
 
   // Find current location details
   const currentLoc = locations.find((l: StorageLocation) => l.id === currentLocId) || null;
@@ -138,7 +141,11 @@ export const StorageManager: React.FC<StorageManagerProps> = ({ onSelectItem }) 
               style={{ 
                 color: idx === arr.length - 1 ? 'var(--text-primary)' : 'var(--accent-color)',
                 fontWeight: idx === arr.length - 1 ? '600' : 'normal',
-                cursor: idx === arr.length - 1 ? 'default' : 'pointer'
+                cursor: idx === arr.length - 1 ? 'default' : 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: '44px',
+                padding: '0 2px'
               }}
               onClick={() => idx !== arr.length - 1 && setCurrentLocId(bc.id)}
             >
@@ -255,9 +262,53 @@ export const StorageManager: React.FC<StorageManagerProps> = ({ onSelectItem }) 
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+        <div 
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}
+          onClick={() => setEditModeCardId(null)}
+        >
           {childLocations.map((loc: StorageLocation) => {
             const count = getRecursiveItemCount(loc.id);
+            const isInEditMode = editModeCardId === loc.id;
+
+            const handleTouchStart = () => {
+              longPressTriggeredRef.current = false;
+              longPressTimerRef.current = setTimeout(() => {
+                longPressTriggeredRef.current = true;
+                setEditModeCardId(loc.id);
+              }, 500);
+            };
+
+            const handleTouchEnd = () => {
+              if (longPressTimerRef.current) {
+                clearTimeout(longPressTimerRef.current);
+                longPressTimerRef.current = null;
+              }
+            };
+
+            const handleTouchMove = () => {
+              if (longPressTimerRef.current) {
+                clearTimeout(longPressTimerRef.current);
+                longPressTimerRef.current = null;
+              }
+            };
+
+            const handleClick = () => {
+              if (longPressTriggeredRef.current) {
+                longPressTriggeredRef.current = false;
+                return;
+              }
+              if (isInEditMode) {
+                setEditModeCardId(null);
+                return;
+              }
+              setCurrentLocId(loc.id);
+            };
+
+            const handleContextMenu = (e: React.MouseEvent) => {
+              e.preventDefault();
+              setEditModeCardId(isInEditMode ? null : loc.id);
+            };
+
             return (
               <div 
                 key={loc.id} 
@@ -270,40 +321,63 @@ export const StorageManager: React.FC<StorageManagerProps> = ({ onSelectItem }) 
                   justifyContent: 'space-between',
                   minHeight: '110px',
                   cursor: 'pointer',
-                  position: 'relative'
+                  position: 'relative',
+                  outline: isInEditMode ? '2px solid var(--accent-color)' : 'none',
+                  outlineOffset: '-2px'
                 }}
-                onClick={() => setCurrentLocId(loc.id)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onTouchMove={handleTouchMove}
+                onContextMenu={handleContextMenu}
+                onClick={handleClick}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div style={{ backgroundColor: 'rgba(var(--accent-rgb), 0.1)', color: 'var(--accent-color)', padding: '6px', borderRadius: '8px' }}>
                     <Icons.Folder size={20} />
-                  </div>
-                  {/* Actions */}
-                  <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
-                    <button 
-                      style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                      onClick={() => {
-                        setEditingLocId(loc.id);
-                        setEditLocName(loc.name);
-                        setEditLocDesc(loc.description || '');
-                      }}
-                      title="编辑"
-                    >
-                      <Icons.Edit2 size={14} />
-                    </button>
-                    <button 
-                      style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                      onClick={() => handleDeleteLocation(loc.id)}
-                      title="删除"
-                    >
-                      <Icons.Trash2 size={14} />
-                    </button>
                   </div>
                 </div>
                 <div style={{ marginTop: '12px' }}>
                   <h4 style={{ fontSize: '15px', fontWeight: '600', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{loc.name}</h4>
                   <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{count} 件物品</span>
                 </div>
+                {/* Edit mode action bar */}
+                {isInEditMode && (
+                  <div 
+                    style={{ 
+                      display: 'flex', 
+                      gap: '8px', 
+                      marginTop: '12px',
+                      paddingTop: '10px',
+                      borderTop: '1px solid var(--border-light)'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button 
+                      className="btn btn-secondary"
+                      style={{ flex: 1, minHeight: '44px', fontSize: '13px', padding: '0 8px' }}
+                      onClick={() => {
+                        setEditingLocId(loc.id);
+                        setEditLocName(loc.name);
+                        setEditLocDesc(loc.description || '');
+                        setEditModeCardId(null);
+                      }}
+                    >
+                      <Icons.Edit2 size={14} style={{ marginRight: '4px' }} />
+                      编辑
+                    </button>
+                    <button 
+                      className="btn btn-danger"
+                      style={{ flex: 1, minHeight: '44px', fontSize: '13px', padding: '0 8px' }}
+                      onClick={() => {
+                        handleDeleteLocation(loc.id);
+                        setEditModeCardId(null);
+                      }}
+                    >
+                      <Icons.Trash2 size={14} style={{ marginRight: '4px' }} />
+                      删除
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
